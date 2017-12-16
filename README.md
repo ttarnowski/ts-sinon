@@ -4,6 +4,10 @@ Sinon extension providing functions to:
 - stub all object methods 
 - stub interface
 
+## Installation
+
+`npm install ts-sinon`
+
 ## Object stubs example
 
 Importing stubObject function:

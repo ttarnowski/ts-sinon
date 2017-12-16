@@ -2,12 +2,35 @@
   "name": "ts-sinon",
   "version": "1.0.0",
   "description": "sinon library extension to stub whole object and interfaces",
-  "main": "index.js",
+  "author": {
+    "name": "Tomasz Tarnowski",
+    "email": "t.tarnowski90@gmail.com",
+    "url": "https://github.com/ttarnowski"
+  },
+  "bugs": {
+    "url": "https://github.com/ttarnowski/ts-sinon/issues"
+  },
+  "homepage": "https://github.com/ttarnowski/ts-sinon",
+  "license": "MIT",
+  "keywords": [
+    "typescript",
+    "node",
+    "sinon",
+    "ts-sinon",
+    "interface stub",
+    "interface mock",
+    "typescript stub",
+    "stub",
+    "typescript sinon"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ttarnowski/ts-sinon.git"
+  },  
+  "main": "index.ts",
   "scripts": {
     "test": "./node_modules/.bin/mocha -r ts-node/register ./index.spec.ts"
   },
-  "author": "Tomasz Tarnowski",
-  "license": "MIT",
   "dependencies": {
     "typescript": "^2.6.2",
     "ts-node": "^4.0.2",
