@@ -1,6 +1,6 @@
 {
   "name": "ts-sinon",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "sinon library extension to stub whole object and interfaces",
   "author": {
     "name": "Tomasz Tarnowski",
@@ -27,7 +27,7 @@
     "type": "git",
     "url": "git://github.com/ttarnowski/ts-sinon.git"
   },
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "prebuild": "rimraf lib",
     "build": "tsc",    
