@@ -6,7 +6,10 @@
         "target": "es2015",
         "removeComments": true,
         "sourceMap": true,
-        "declaration": true
+        "declaration": true,
+        "lib": [
+            "es7"
+        ]
     },
     "exclude": [
         "node_modules",

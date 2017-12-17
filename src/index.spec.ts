@@ -8,7 +8,7 @@ const expect = chai.expect;
 
 describe('ts-sinon', () => {
     describe('stubObject', () => {
-        it('returns stub object with all methods stubbed when no methods or method map given', () => {
+        it('returns stub es6 object with all methods stubbed when no methods or method map given', () => {
             const object = new class {
                 test() {
                     return 123;
@@ -31,6 +31,28 @@ describe('ts-sinon', () => {
             expect(objectStub.test).to.have.been.called;
         });
 
+        it('returns stub literal object with all methods stubbed when no methods or method map given', () => {
+            const object = {
+                test: () => {
+                    return 123;
+                },
+                run: () => {
+                    return 'run';
+                }
+            };
+
+            const objectStub = stubObject(object);
+
+            expect(object.test()).to.equal(123);
+            expect(object.run()).to.equal('run');
+
+            expect(objectStub.test()).to.be.undefined;
+            expect(objectStub.run()).to.be.undefined;
+
+            expect(objectStub.run).to.have.been.called;
+            expect(objectStub.test).to.have.been.called;
+        });
+        
         it('returns partial stub object with only "test" method stubbed when array with "test" has been given', () => {
             const object = new class {
                 private r: string;

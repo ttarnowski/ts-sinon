@@ -3,9 +3,22 @@ import * as sinon from "sinon";
 export function stubObject<T extends object>(object: T, methods?): T {
     const stubObject = Object.assign(<T> {}, object);
     const objectMethods = Object.getOwnPropertyNames(Object.getPrototypeOf(object));
+    const excludedMethods: string[] = [
+        '__defineGetter__', '__defineSetter__', 'hasOwnProperty',
+        '__lookupGetter__', '__lookupSetter__', 'propertyIsEnumerable',
+        'toString', 'valueOf', '__proto__', 'toLocaleString', 'isPrototypeOf'
+    ];
+
+    for (let method in object) {
+        if (typeof object[method] == "function") {
+            objectMethods.push(method);
+        }
+    }    
 
     for (let method of objectMethods) {
-        stubObject[method] = object[method];
+        if (!excludedMethods.includes(method)) {
+            stubObject[method] = object[method];
+        }
     }
 
     if (Array.isArray(methods)) {
