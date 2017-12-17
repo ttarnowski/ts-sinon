@@ -1,6 +1,6 @@
 {
   "name": "ts-sinon",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "sinon library extension to stub whole object and interfaces",
   "author": {
     "name": "Tomasz Tarnowski",
@@ -26,9 +26,11 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/ttarnowski/ts-sinon.git"
-  },  
+  },
   "main": "index.js",
   "scripts": {
+    "prebuild": "rimraf lib",
+    "build": "tsc",    
     "test": "./node_modules/.bin/mocha -r ts-node/register ./index.spec.ts"
   },
   "dependencies": {
@@ -38,10 +40,11 @@
     "@types/sinon": "^4.1.2"
   },
   "devDependencies": {
+    "@types/chai": "^4.0.10",
+    "@types/mocha": "^2.2.44",
     "chai": "^4.1.2",
     "mocha": "^4.0.1",
-    "sinon-chai": "^2.14.0",
-    "@types/chai": "^4.0.10",
-    "@types/mocha": "^2.2.44"
+    "rimraf": "^2.6.2",
+    "sinon-chai": "^2.14.0"
   }
 }
