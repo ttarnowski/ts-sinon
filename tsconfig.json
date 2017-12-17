@@ -3,17 +3,14 @@
         "outDir": "./lib",
         "module": "commonjs",
         "moduleResolution": "node",
-        "target": "es5",
+        "target": "es2015",
         "removeComments": true,
         "sourceMap": true,
-        "declaration": true,
-        "lib": [
-            "es5",
-            "es6",
-            "dom"
-        ],
-        "types": [
-            "node"
-        ]
-    }
+        "declaration": true
+    },
+    "exclude": [
+        "node_modules",
+        "lib",
+        "*.spec.ts"
+    ]
 }

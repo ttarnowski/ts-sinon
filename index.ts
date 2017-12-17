@@ -1,24 +1,31 @@
 import * as sinon from "sinon";
 
 export function stubObject<T extends object>(object: T, methods?): T {
+    const stubObject = Object.assign(<T> {}, object);
+    const objectMethods = Object.getOwnPropertyNames(Object.getPrototypeOf(object));
+
+    for (let method of objectMethods) {
+        stubObject[method] = object[method];
+    }
+
     if (Array.isArray(methods)) {
         for (let method of methods) {
-            object[method] = sinon.stub();
+            stubObject[method] = sinon.stub();
         }
     } else if (typeof methods == "object") {
         for (let method in methods) {
-            object[method] = sinon.stub();
-            object[method].returns(methods[method]);
+            stubObject[method] = sinon.stub();
+            stubObject[method].returns(methods[method]);
         }
     } else {
-        for (let method in object) {
-            if (typeof object[method] == "function") {
-                object[method] = sinon.stub();
+        for (let method of objectMethods) {
+            if (typeof object[method] == "function" && method !== "constructor") {
+                stubObject[method] = sinon.stub();
             }
         }
     }
 
-    return object;
+    return stubObject;
 }
 
 export function stubInterface<T extends object>(methods: object = {}): T {
