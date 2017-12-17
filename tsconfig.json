@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "outDir": "./lib",
+        "outDir": "./dist",
         "module": "commonjs",
         "moduleResolution": "node",
         "target": "es2015",
@@ -10,7 +10,7 @@
     },
     "exclude": [
         "node_modules",
-        "lib",
-        "*.spec.ts"
+        "dist",
+        "src/*.spec.ts"
     ]
 }
