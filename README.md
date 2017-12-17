@@ -4,6 +4,11 @@ Sinon extension providing functions to:
 - stub all object methods 
 - stub interface
 
+## Prerequisites
+
+1. You have a version of Node.js >= [v8.4.0](https://nodejs.org/en/download/)
+2. You have installed [Typescript](https://www.typescriptlang.org/index.html#download-links)
+
 ## Installation
 
 `npm install ts-sinon`
