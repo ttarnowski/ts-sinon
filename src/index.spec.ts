@@ -2,6 +2,7 @@ import * as chai from "chai";
 import * as sinonChai from "sinon-chai";
 
 import { stubObject, stubInterface } from "./index";
+import { SinonStubbedInstance } from "sinon";
 
 chai.use(sinonChai);
 const expect = chai.expect;
@@ -102,10 +103,13 @@ describe('ts-sinon', () => {
             method2(num: number): string;
         }
 
-        it('returns stub object created from interface with all methods stubbed when no method map given', () => {
-            const expectedMethod2Arg = 2;
-            const interfaceStub: ITest = stubInterface<ITest>(); 
-            interfaceStub.method2.returns('string');
+        it('returns stub object created from interface with all methods stubbed with "method2" predefined to return value of "abc" and "method1" which is testable with expect that has been called', () => {
+            const expectedMethod2Arg: number = 2;
+            const expectedMethod2ReturnValue = 'abc';
+
+            const interfaceStub: ITest = stubInterface<ITest>({
+                method2: expectedMethod2ReturnValue
+            });
 
             const object = new class {
                 test: ITest;
@@ -118,7 +122,7 @@ describe('ts-sinon', () => {
                 }
             }(interfaceStub);
 
-            expect(object.run(expectedMethod2Arg)).to.equal('string');
+            expect(object.run(expectedMethod2Arg)).to.equal(expectedMethod2ReturnValue);
             expect(interfaceStub.method1).to.have.been.called;
             expect(interfaceStub.method2).to.have.been.calledWith(expectedMethod2Arg);
         });
@@ -140,6 +144,28 @@ describe('ts-sinon', () => {
             }(interfaceStub);
 
             expect(object.run(123)).to.equal('test');
+        });
+
+        it('gives an access to method stubs of the stub object created from interface when the type of the interface type is cast to "any" and the ability to stub and test interface methods', () => {
+            const expectedMethod2Arg = 2;
+
+            const interfaceStub: any = stubInterface<ITest>(); 
+            interfaceStub.method2.returns('string');
+
+            const object = new class {
+                test: ITest;
+                constructor(test: ITest) {
+                    this.test = test;
+                    this.test.method1();
+                }
+                run(num: number): string {
+                    return this.test.method2(num);
+                }
+            }(interfaceStub);
+
+            expect(object.run(expectedMethod2Arg)).to.equal('string');
+            expect(interfaceStub.method1).to.have.been.called;
+            expect(interfaceStub.method2).to.have.been.calledWith(expectedMethod2Arg);
         });
     });            
 });
