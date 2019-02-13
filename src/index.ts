@@ -43,7 +43,7 @@ export function stubObject<T extends object>(object: T, methods?): T {
 
 export function stubInterface<T extends object>(methods: object = {}): T {
     const object: T = stubObject<T>(<T> {}, methods);
-    
+        
     const proxy = new Proxy(object, {
         get: (target, name) => {
             if (!target[name]) {

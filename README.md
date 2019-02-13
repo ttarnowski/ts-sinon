@@ -87,23 +87,7 @@ import * as sinon from "ts-sinon";
 const stubInterface = sinon.stubInterface;
 ```
 
-Interface stub:
-
-```javascript
-interface Test {
-    method(): string;
-}
-
-const testStub = stubInterface<Test>();
-
-expect(testStub.method()).to.be.undefined;
-
-testStub.method.returns('stubbed');
-
-expect(testStub.method()).to.equal('stubbed');
-```
-
-Interface stub with predefined return values:
+Interface stub with predefined return values (recommended):
 
 ```javascript
 interface Test {
@@ -111,6 +95,23 @@ interface Test {
 }
 
 const testStub = stubInterface<Test>({ method: 'stubbed' });
+
+expect(testStub.method()).to.equal('stubbed');
+```
+
+Interface stub (not recommended due to interface stub method return types incompatibility - if the return value of stubInterface method is not cast to "any" type and returned type of interface method is not compatible with "object" we'll get a compiler error).
+
+```javascript
+interface Test {
+    method(): string;
+}
+
+// if we have "Test" type instead of "any" code does not compile
+const testStub: any = stubInterface<Test>();
+
+expect(testStub.method()).to.be.undefined;
+
+testStub.method.returns('stubbed');
 
 expect(testStub.method()).to.equal('stubbed');
 ```
