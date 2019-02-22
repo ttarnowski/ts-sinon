@@ -1,6 +1,6 @@
 {
   "name": "ts-sinon",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "sinon library extension to stub whole object and interfaces",
   "author": {
     "name": "Tomasz Tarnowski",
@@ -30,7 +30,7 @@
   "main": "./dist/index.js",
   "typings": "./dist/index.d.ts",
   "scripts": {
-    "prepublishOnly": "tsc -p ./ --outDir dist/",
+    "postinstall": "tsc -p ./ --outDir dist/",
     "test": "./node_modules/.bin/mocha -r ts-node/register ./src/index.spec.ts"
   },
   "dependencies": {
