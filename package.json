@@ -1,6 +1,6 @@
 {
   "name": "ts-sinon",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "sinon library extension to stub whole object and interfaces",
   "author": {
     "name": "Tomasz Tarnowski",
