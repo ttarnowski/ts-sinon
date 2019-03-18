@@ -8,7 +8,9 @@
         "sourceMap": true,
         "declaration": true,
         "lib": [
-            "es7"
+            "es7",
+            "dom",
+            "es2015"
         ]
     },
     "exclude": [
