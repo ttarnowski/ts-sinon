@@ -13,7 +13,7 @@ export function stubObject<T extends object>(object: T, methods?): T {
         if (typeof object[method] == "function") {
             objectMethods.push(method);
         }
-    }    
+    }
 
     for (let method of objectMethods) {
         if (!excludedMethods.includes(method)) {
@@ -31,12 +31,37 @@ export function stubObject<T extends object>(object: T, methods?): T {
             stubObject[method].returns(methods[method]);
         }
     } else {
-        for (let method of objectMethods) {
-            if (typeof object[method] == "function" && method !== "constructor") {
-                stubObject[method] = sinon.stub();
-                stubObject[method]._stub = stubObject[method];
+        const stub = (object, objectMethods, stubObject) => {
+            for (let method of objectMethods) {
+                if (typeof object[method] == "function" && method !== "constructor") {
+                    stubObject[method] = sinon.stub();
+                    stubObject[method]._stub = stubObject[method];
+                }
             }
         }
+
+
+        const iterate = (nested, stubObject, root = false) => {
+            if (root) {
+                stub(object, objectMethods, stubObject);
+            } else {
+                let objectMethods = Object.getOwnPropertyNames(nested)
+                const prototype = Object.getPrototypeOf(nested);
+                if (prototype) {
+                    objectMethods = objectMethods.concat(Object.getOwnPropertyNames(prototype));
+                }
+                if (objectMethods.length) {
+                    stub(nested, objectMethods, stubObject);
+                }
+            }
+
+            Object.keys(nested).forEach(key => {
+                if (typeof nested[key] === 'object') {
+                    iterate(nested[key], stubObject[key])
+                }
+            })
+        }
+        iterate(object, stubObject, true)
     }
 
     return stubObject;
@@ -44,7 +69,7 @@ export function stubObject<T extends object>(object: T, methods?): T {
 
 export function stubInterface<T extends object>(methods: object = {}): T {
     const object: T = stubObject<T>(<T> {}, methods);
-        
+
     const proxy = new Proxy(object, {
         get: (target, name) => {
             if (!target[name]) {

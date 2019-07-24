@@ -115,6 +115,30 @@ describe('ts-sinon', () => {
             objectStub.test['_stub'].resolves('stubbed');
             expect(await objectStub.test()).to.equal('stubbed');
         });
+
+        it('should traverse nested objects', () => {
+            const nested = new class {
+                nested() {
+                    return 456;
+                }
+            }
+
+            const object = new class {
+                test() {
+                    return 123;
+                }
+
+                run() {
+                    return 'run';
+                }
+
+                nested = nested;
+            }
+
+            const objectStub = stubObject(object);
+            expect(objectStub.nested.nested()).to.be.undefined;
+            expect(objectStub.nested.nested).to.have.been.called;
+        });
     });
     describe('stubInterface', () => {
         interface ITest {
