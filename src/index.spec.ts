@@ -96,6 +96,25 @@ describe('ts-sinon', () => {
 
             expect(objectStub.run).to.have.been.called;
         });
+
+        it('should expose a _stub property on stubbed methods', async () => {
+            // allows accessing method['_stub'] and with that use sinon stub methods like `.resolves`
+            const object = new class {
+                test() {
+                    return 123;
+                }
+
+                run() {
+                    return 'run';
+                }
+            }
+
+            const objectStub = stubObject(object);
+
+            expect(objectStub.test['_stub']).to.exist;
+            objectStub.test['_stub'].resolves('stubbed');
+            expect(await objectStub.test()).to.equal('stubbed');
+        });
     });
     describe('stubInterface', () => {
         interface ITest {

@@ -39,7 +39,7 @@ class Test {
 const test = new Test();
 const testStub = stubObject<Test>(test);
 
-testStub.method.returns('stubbed');
+testStub.method['_stub'].returns('stubbed');
 
 expect(testStub.method()).to.equal('stubbed');
 ```

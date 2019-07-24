@@ -34,6 +34,7 @@ export function stubObject<T extends object>(object: T, methods?): T {
         for (let method of objectMethods) {
             if (typeof object[method] == "function" && method !== "constructor") {
                 stubObject[method] = sinon.stub();
+                stubObject[method]._stub = stubObject[method];
             }
         }
     }
