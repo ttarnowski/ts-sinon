@@ -1,6 +1,6 @@
 import * as sinon from "sinon";
 
-export function stubObject<T extends object>(object: T, methods?): T {
+export function stubObject<T extends object>(object: T, methods?: string[] | object): T {
     const stubObject = Object.assign(<T> {}, object);
     const objectMethods = Object.getOwnPropertyNames(Object.getPrototypeOf(object));
     const excludedMethods: string[] = [
