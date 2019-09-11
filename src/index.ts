@@ -1,7 +1,10 @@
 import * as sinon from "sinon";
 
-export function stubObject<T extends object>(object: T, methods?: string[] | object): T {
-    const stubObject = Object.assign(<T> {}, object);
+/**
+ * @param methods passing map of methods has become @deprecated as it may lead to overwriting stubbed method type
+ */
+export function stubObject<T extends object>(object: T, methods?: string[] | object): sinon.SinonStubbedInstance<T> {
+    const stubObject = Object.assign(<sinon.SinonStubbedInstance<T>> {}, object);
     const objectMethods = Object.getOwnPropertyNames(Object.getPrototypeOf(object));
     const excludedMethods: string[] = [
         '__defineGetter__', '__defineSetter__', 'hasOwnProperty',
@@ -41,8 +44,15 @@ export function stubObject<T extends object>(object: T, methods?: string[] | obj
     return stubObject;
 }
 
-export function stubInterface<T extends object>(methods: object = {}): T {
-    const object: T = stubObject<T>(<T> {}, methods);
+export function stubConstructor<T extends object>(constructor: sinon.StubbableType<T>): sinon.SinonStubbedInstance<T> {
+    return sinon.createStubInstance(constructor);
+}
+
+/**
+ * @param methods passing map of methods has become @deprecated as it may lead to overwriting stubbed method type
+ */
+export function stubInterface<T extends object>(methods: object = {}): sinon.SinonStubbedInstance<T> {
+    const object = stubObject<T>(<T> {}, methods);
         
     const proxy = new Proxy(object, {
         get: (target, name) => {
