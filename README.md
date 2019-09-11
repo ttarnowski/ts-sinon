@@ -3,6 +3,7 @@
 Sinon extension providing functions to:
 - stub all object methods 
 - stub interface
+- stub object constructor
 
 ## Prerequisites
 
@@ -11,7 +12,9 @@ Sinon extension providing functions to:
 
 ## Installation
 
-`npm install ts-sinon`
+`npm install --save-dev ts-sinon`
+or
+`yarn add --dev ts-sinon`
 
 ## Object stubs example
 
@@ -59,7 +62,7 @@ expect(testStub.methodA()).to.be.undefined;
 expect(testStub.methodB()).to.equal('B: original');
 ```
 
-Stub with predefined return values:
+Stub with predefined return values (deprecated - see the deprecation note):
 
 ```javascript
 class Test {
@@ -87,7 +90,23 @@ import * as sinon from "ts-sinon";
 const stubInterface = sinon.stubInterface;
 ```
 
-Interface stub with predefined return values (recommended):
+Interface stub (stub all methods):
+
+```javascript
+interface Test {
+    method(): string;
+}
+
+const testStub = stubInterface<Test>();
+
+expect(testStub.method()).to.be.undefined;
+
+testStub.method.returns('stubbed');
+
+expect(testStub.method()).to.equal('stubbed');
+```
+
+Interface stub with predefined return values (deprecated - see the deprecation note):
 
 ```javascript
 interface Test {
@@ -99,21 +118,58 @@ const testStub = stubInterface<Test>({ method: 'stubbed' });
 expect(testStub.method()).to.equal('stubbed');
 ```
 
-Interface stub (not recommended due to interface stub method return types incompatibility - if the return value of stubInterface method is not cast to "any" type and returned type of interface method is not compatible with "object" we'll get a compiler error).
+## Object constructor stub example
+
+Importing stubConstructor function:
+
+- import single function:
+```javascript
+import { stubConstructor } from "ts-sinon";
+```
+
+- import as part of sinon singleton:
+```javascript
+import * as sinon from "ts-sinon";
+
+const stubConstructor = sinon.stubConstructor;
+```
+
+Object constructor stub (stub all methods):
 
 ```javascript
-interface Test {
-    method(): string;
+class Test {
+    method(): string {
+        return 'value';
+    }
 }
 
-// if we have "Test" type instead of "any" code does not compile
-const testStub: any = stubInterface<Test>();
+const testStub = stubConstructor<Test>(Test);
 
 expect(testStub.method()).to.be.undefined;
 
 testStub.method.returns('stubbed');
 
 expect(testStub.method()).to.equal('stubbed');
+```
+
+## Method map argument deprecation note
+
+Due to a potential risk of overwriting return value type of stubbed method (that won't be caught by TypeScript compiler) I have decided to mark it as deprecated.
+Please look at the following example of type overwriting using method map:
+
+```javascript
+interface ITest {
+    method1(): void;
+    method2(num: number): string;
+}
+
+const interfaceStub: ITest = stubInterface<ITest>({
+    method2: 12345
+});
+
+// following expression will assign 12345 value of type number to v variable which is incorrect (it will compile without an error)
+const v: string = interfaceStub.method2(1);
+
 ```
 
 ## Sinon methods
