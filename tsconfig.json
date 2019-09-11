@@ -1,19 +1,19 @@
 {
     "compilerOptions": {
-        "outDir": "./dist",
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "target": "es2015",
-        "removeComments": true,
-        "sourceMap": true,
         "declaration": true,
-        "lib": [
-            "es7"
-        ]
+        "declarationDir": "./dist",
+        "module": "commonjs",
+        "lib": ["es2017", "es7", "es6", "dom"],
+        "outDir": "./dist",
+        "target": "es5",
+        "moduleResolution": "node"
     },
-    "exclude": [
-        "node_modules",
-        "dist",
-        "src/*.spec.ts"
-    ]
+    "typedocOptions": {
+        "mode": "modules",
+        "out": "docs"
+    },
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": ["node_modules", "dist", "./src/index.spec.ts"]
 }
