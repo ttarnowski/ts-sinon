@@ -56,7 +56,7 @@ export function stubInterface<T extends object>(methods: object = {}): sinon.Sin
         
     const proxy = new Proxy(object, {
         get: (target, name) => {
-            if (!target[name]) {
+            if (!target[name] && name !== 'then') {
                 target[name] = sinon.stub();
             }
 
