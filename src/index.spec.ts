@@ -207,6 +207,36 @@ describe('ts-sinon', () => {
             expect(actualMethod2Value).to.equal(expectedMethod2Value);
             expect(interfaceStub.method1).to.have.been.called;
         });
+
+        it('stubs method to return resolved Promise with another interface stub', async () => {
+            interface Test {
+                methodA(): Promise<ITest>;
+            }
+
+            const interfaceTestStub = stubInterface<Test>();
+            const interfaceITestStub = stubInterface<ITest>();
+
+            interfaceTestStub.methodA.returns(Promise.resolve(interfaceITestStub));
+
+            expect(await interfaceTestStub.methodA()).to.equal(interfaceITestStub);
+        });
+
+        it('stubs method to return rejected Promise with another interface stub', async () => {
+            interface Test {
+                methodA(): Promise<ITest>;
+            }
+
+            const interfaceTestStub = stubInterface<Test>();
+            const interfaceITestStub = stubInterface<ITest>();
+
+            interfaceTestStub.methodA.returns(Promise.reject(interfaceITestStub));
+
+            try {
+                await interfaceTestStub.methodA();
+            } catch (e) {
+                expect(e).to.equal(interfaceITestStub);
+            }
+        });
     });         
     
     describe('stubConstructor', () => {
