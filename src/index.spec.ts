@@ -242,6 +242,8 @@ describe('ts-sinon', () => {
     describe('stubConstructor', () => {
         it('stubs all object constructor methods', () => {
             class A {
+                private pp = 5;
+                
                 method1(): string {
                     return 'value1';
                 }
