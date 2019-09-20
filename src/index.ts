@@ -1,9 +1,11 @@
 import * as sinon from "sinon";
 
+export type StubbedInstance<T> = sinon.SinonStubbedInstance<T> & T;
+
 /**
  * @param methods passing map of methods has become @deprecated as it may lead to overwriting stubbed method type
  */
-export function stubObject<T extends object>(object: T, methods?: string[] | object): sinon.SinonStubbedInstance<T> & T {
+export function stubObject<T extends object>(object: T, methods?: string[] | object): StubbedInstance<T> {
     const stubObject = Object.assign(<sinon.SinonStubbedInstance<T>> {}, object);
     const objectMethods = Object.getOwnPropertyNames(Object.getPrototypeOf(object));
     const excludedMethods: string[] = [
@@ -44,14 +46,14 @@ export function stubObject<T extends object>(object: T, methods?: string[] | obj
     return stubObject;
 }
 
-export function stubConstructor<T extends object>(constructor: sinon.StubbableType<T>): sinon.SinonStubbedInstance<T> & T {
-    return sinon.createStubInstance(constructor) as unknown as sinon.SinonStubbedInstance<T> & T;
+export function stubConstructor<T extends object>(constructor: sinon.StubbableType<T>): StubbedInstance<T> {
+    return sinon.createStubInstance(constructor) as unknown as StubbedInstance<T>;
 }
 
 /**
  * @param methods passing map of methods has become @deprecated as it may lead to overwriting stubbed method type
  */
-export function stubInterface<T extends object>(methods: object = {}): sinon.SinonStubbedInstance<T> & T {
+export function stubInterface<T extends object>(methods: object = {}): StubbedInstance<T> {
     const object = stubObject<T>(<T> {}, methods);
         
     const proxy = new Proxy(object, {
