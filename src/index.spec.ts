@@ -2,6 +2,7 @@ import * as chai from "chai";
 import * as sinonChai from "sinon-chai";
 
 import { stubObject, stubInterface, stubConstructor } from "./index";
+import * as s from "./index"
 
 chai.use(sinonChai);
 const expect = chai.expect;
@@ -243,6 +244,9 @@ describe('ts-sinon', () => {
         it('stubs all object constructor methods', () => {
             class A {
                 private pp = 5;
+                public ps: string = "x";
+
+                constructor(private pt: string, public px: number, y: boolean) {}
                 
                 method1(): string {
                     return 'value1';
@@ -254,9 +258,12 @@ describe('ts-sinon', () => {
             const expectedNewMethod1Value = 'new value';
             const expectedNewMethod2Value = 43;
             const expectedMethod2Argument = 111;
+            const expectedPxPassedToConstructor = 4;
 
-            const stub = stubConstructor<A>(A);
-
+            const stub = stubConstructor(A, "a", expectedPxPassedToConstructor, true);
+            
+            expect(stub.ps).to.equal("x");
+            expect(stub.px).to.equal(expectedPxPassedToConstructor);
             expect(stub.method1()).to.be.undefined;
             expect(stub.method2(expectedMethod2Argument)).to.be.undefined;
 
