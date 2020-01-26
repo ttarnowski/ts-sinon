@@ -136,20 +136,44 @@ const stubConstructor = sinon.stubConstructor;
 
 Object constructor stub (stub all methods):
 
+- without passing predefined args to the constructor:
 ```javascript
 class Test {
+    public someVar: number = 10;
+
     method(): string {
         return 'value';
     }
 }
 
-const testStub = stubConstructor<Test>(Test);
+// type will be guessed automatically
+const testStub = stubConstructor(Test);
 
 expect(testStub.method()).to.be.undefined;
 
 testStub.method.returns('stubbed');
 
 expect(testStub.method()).to.equal('stubbed');
+
+expect(testStub.someVar).to.equal(10);
+
+testStub.someVar = 20;
+
+expect(testStub.someVar).to.equal(20);
+```
+
+- with passing predefined args to the constructor:
+```javascript
+class Test {
+    constructor(public someVar: string, y: boolean) {}
+
+    // ...
+}
+
+// it won't allow to pass incorrect args
+const testStub = stubConstructor(Test, "someVar value", true);
+
+expect(testStub.someVar).to.equal("someValue");
 ```
 
 ## Method map argument deprecation note
@@ -177,12 +201,23 @@ const v: string = interfaceStub.method2(1);
 By importing 'ts-sinon' you have access to all sinon methods.
 
 ```javascript
-import * as sinon from "ts-sinon";
+import sinon, { stubInterface } from "ts-sinon";
 
 const functionStub = sinon.stub();
 const spy = sinon.spy();
+// ...
+```
 
-// etc.
+or
+
+```javascript
+import * as tsSinon from "ts-sinon"
+
+const functionStub = tsSinon.default.stub();
+const spy = tsSinon.default.spy();
+const tsStubInterface = tsSinon.stubInterface<T>();
+
+// ...
 ```
 
 ## Packages

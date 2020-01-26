@@ -46,8 +46,11 @@ export function stubObject<T extends object>(object: T, methods?: string[] | obj
     return stubObject;
 }
 
-export function stubConstructor<T extends object>(constructor: sinon.StubbableType<T>): StubbedInstance<T> {
-    return sinon.createStubInstance(constructor) as unknown as StubbedInstance<T>;
+export function stubConstructor<T extends new (...args: any[]) => any>(
+    constructor: T,
+    ...constructorArgs: ConstructorParameters<T> | undefined[]
+): StubbedInstance<InstanceType<T>> {
+    return stubObject(new constructor(...constructorArgs));
 }
 
 /**
