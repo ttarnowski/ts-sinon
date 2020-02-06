@@ -14,29 +14,29 @@ export function stubObject<T extends object>(object: T, methods?: string[] | obj
         'toString', 'valueOf', '__proto__', 'toLocaleString', 'isPrototypeOf'
     ];
 
-    for (let method in object) {
+    for (const method in object) {
         if (typeof object[method] == "function") {
             objectMethods.push(method);
         }
     }    
 
-    for (let method of objectMethods) {
+    for (const method of objectMethods) {
         if (!excludedMethods.includes(method)) {
             stubObject[method] = object[method];
         }
     }
 
     if (Array.isArray(methods)) {
-        for (let method of methods) {
+        for (const method of methods) {
             stubObject[method] = sinon.stub();
         }
     } else if (typeof methods == "object") {
-        for (let method in methods) {
+        for (const method in methods) {
             stubObject[method] = sinon.stub();
             stubObject[method].returns(methods[method]);
         }
     } else {
-        for (let method of objectMethods) {
+        for (const method of objectMethods) {
             if (typeof object[method] == "function" && method !== "constructor") {
                 stubObject[method] = sinon.stub();
             }
