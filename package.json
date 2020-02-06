@@ -1,7 +1,7 @@
 {
   "name": "ts-sinon",
-  "version": "1.0.25",
-  "description": "sinon library extension to stub whole object and interfaces",
+  "version": "1.1.0",
+  "description": "Sinon library extension to stub objects and interfaces in TypeScript",
   "author": {
     "name": "Tomasz Tarnowski",
     "email": "t.tarnowski90@gmail.com",

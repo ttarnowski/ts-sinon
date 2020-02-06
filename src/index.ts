@@ -1,71 +1,58 @@
-import * as sinon from "sinon";
+import * as sinon from 'sinon';
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object#Methods_2
+const excludedMethods: string[] = Object.getOwnPropertyNames(Object.getPrototypeOf({}))
+    .filter(p => !['constructor', 'toSource'].includes(p));
 
 export type StubbedInstance<T> = sinon.SinonStubbedInstance<T> & T;
 
-/**
- * @param methods passing map of methods has become @deprecated as it may lead to overwriting stubbed method type
- */
-export function stubObject<T extends object>(object: T, methods?: string[] | object): StubbedInstance<T> {
-    const stubObject = Object.assign(<sinon.SinonStubbedInstance<T>> {}, object);
+export function stubObject<T extends object>(object: T, onlyTheseMethods?: string[]): StubbedInstance<T> {
+    const stubbedObject = Object.assign(<sinon.SinonStubbedInstance<T>> {}, object);
     const objectMethods = Object.getOwnPropertyNames(Object.getPrototypeOf(object));
-    const excludedMethods: string[] = [
-        '__defineGetter__', '__defineSetter__', 'hasOwnProperty',
-        '__lookupGetter__', '__lookupSetter__', 'propertyIsEnumerable',
-        'toString', 'valueOf', '__proto__', 'toLocaleString', 'isPrototypeOf'
-    ];
 
-    for (let method in object) {
-        if (typeof object[method] == "function") {
+    for (const method in object) {
+        if (typeof object[method] === 'function') {
             objectMethods.push(method);
-        }
-    }    
-
-    for (let method of objectMethods) {
-        if (!excludedMethods.includes(method)) {
-            stubObject[method] = object[method];
         }
     }
 
-    if (Array.isArray(methods)) {
-        for (let method of methods) {
-            stubObject[method] = sinon.stub();
+    for (const method of objectMethods) {
+        if (!excludedMethods.includes(method)) {
+            stubbedObject[method] = object[method];
         }
-    } else if (typeof methods == "object") {
-        for (let method in methods) {
-            stubObject[method] = sinon.stub();
-            stubObject[method].returns(methods[method]);
+    }
+
+    if (onlyTheseMethods && onlyTheseMethods.length > 0) {
+        for (const method of onlyTheseMethods) {
+            stubbedObject[method] = sinon.stub();
         }
     } else {
-        for (let method of objectMethods) {
-            if (typeof object[method] == "function" && method !== "constructor") {
-                stubObject[method] = sinon.stub();
+        for (const method of objectMethods) {
+            if (typeof object[method] === 'function' && method !== 'constructor') {
+                stubbedObject[method] = sinon.stub();
             }
         }
     }
-
-    return stubObject;
+    
+    return stubbedObject;
 }
 
 export function stubConstructor<T extends new (...args: any[]) => any>(
-    constructor: T,
-    ...constructorArgs: ConstructorParameters<T> | undefined[]
+    constructor: T, ...constructorArgs: ConstructorParameters<T> | undefined[]
 ): StubbedInstance<InstanceType<T>> {
     return stubObject(new constructor(...constructorArgs));
 }
 
-/**
- * @param methods passing map of methods has become @deprecated as it may lead to overwriting stubbed method type
- */
-export function stubInterface<T extends object>(methods: object = {}): StubbedInstance<T> {
-    const object = stubObject<T>(<T> {}, methods);
+export function stubInterface<T extends object>(): StubbedInstance<T> {
+    const object = stubObject<T>(<T> {});
         
     const proxy = new Proxy(object, {
-        get: (target, name) => {
-            if (!target[name] && name !== 'then') {
-                target[name] = sinon.stub();
+        get: (target, property) => {
+            if (!target[property] && property !== 'then') {
+                target[property] = sinon.stub();
             }
 
-            return target[name];
+            return target[property];
         }
     })
 
@@ -73,6 +60,7 @@ export function stubInterface<T extends object>(methods: object = {}): StubbedIn
 }
 
 sinon['stubObject'] = stubObject;
+sinon['stubConstructor'] = stubConstructor;
 sinon['stubInterface'] = stubInterface;
 
 export default sinon;
