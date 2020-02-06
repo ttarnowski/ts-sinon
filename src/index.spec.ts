@@ -1,279 +1,228 @@
-import * as chai from "chai";
-import * as sinonChai from "sinon-chai";
+import * as chai from 'chai';
+import * as sinonChai from 'sinon-chai';
 
-import { stubObject, stubInterface, stubConstructor } from "./index";
-import * as s from "./index"
+import { stubConstructor, stubInterface, stubObject } from './index';
 
-chai.use(sinonChai);
 const expect = chai.expect;
+chai.use(sinonChai);
 
 describe('ts-sinon', () => {
-    describe('stubObject', () => {
-        describe('when no methods or method map given', () => {
-            it('returns stub es6 object with all methods stubbed', () => {
-                class A {
-                    test() {
-                        return 123;
+    describe(stubObject.name, () => {
+        describe('when methods list is not given', () => {
+            it('stubs all methods of an ES6 object', () => {
+                class MyClass {
+                    number() {
+                        return 42;
                     }
-    
-                    run() {
-                        return 'run';
+                    string() {
+                        return 'hi';
                     }
                 }
 
-                const object = new A();
+                const object = new MyClass();
+                const stub = stubObject(object);
     
-                const objectStub = stubObject<A>(object);
+                expect(stub.number()).to.be.undefined;
+                expect(stub.string()).to.be.undefined;
     
-                expect(object.test()).to.equal(123);
-                expect(object.run()).to.equal('run');
-    
-                expect(objectStub.test()).to.be.undefined;
-                expect(objectStub.run()).to.be.undefined;
-    
-                expect(objectStub.run).to.have.been.called;
-                expect(objectStub.test).to.have.been.called;
+                expect(stub.string).to.have.been.called;
+                expect(stub.number).to.have.been.called;
+            });
+
+            it('allows to change ES6 object stub values', () => {
+                class MyClass {
+                    number() {
+                        return 42;
+                    }
+                    string() {
+                        return 'hi';
+                    }
+                }
+
+                const object = new MyClass();
+                const stub = stubObject(object);
+
+                stub.number.returns(24);
+                stub.string.returns('bye');
+
+                expect(stub.number()).to.equal(24);
+                expect(stub.string()).to.equal('bye');
             });
     
-            it('returns stub literal object with all methods stubbed', () => {
+            it('stubs all methods of a literal object', () => {
                 const object = {
-                    test: () => {
-                        return 123;
+                    number: () => {
+                        return 42;
                     },
-                    run: () => {
-                        return 'run';
+                    string: () => {
+                        return 'hi';
                     }
                 };
     
-                const objectStub = stubObject(object);
+                const stub = stubObject(object);
     
-                expect(object.test()).to.equal(123);
-                expect(object.run()).to.equal('run');
+                expect(stub.number()).to.be.undefined;
+                expect(stub.string()).to.be.undefined;
     
-                expect(objectStub.test()).to.be.undefined;
-                expect(objectStub.run()).to.be.undefined;
-    
-                expect(objectStub.run).to.have.been.called;
-                expect(objectStub.test).to.have.been.called;
+                expect(stub.number).to.have.been.called;
+                expect(stub.string).to.have.been.called;
             });
 
-            it('allows to change stub values', () => {
-                const object1 = new class {
-                    methodA() {
-                        return 'A';
-                    }
-
-                    methodB() {
-                        return 'B';
-                    }
-                }
-
-                const object2 = {
-                    methodC: () => {
-                        return 'C';
+            it('allows to change literal object stub values', () => {
+                const object = {
+                    number: () => {
+                        return 42;
                     },
-                    methodD: () => {
-                        return 'D';
+                    string: () => {
+                        return 'hi';
                     }
                 }
 
-                const object1Stub = stubObject(object1);
-                const object2Stub = stubObject(object2);
+                const stub = stubObject(object);
 
-                object1Stub.methodA.returns('new A');
-                object1Stub.methodB.returns('new B');
+                stub.number.returns(24);
+                stub.string.returns('bye');
 
-                expect(object1Stub.methodA()).to.equal('new A');
-                expect(object1Stub.methodB()).to.equal('new B');
-
-                object2Stub.methodC.returns('1');
-                object2Stub.methodD.returns('2');
-
-                expect(object2Stub.methodC()).to.equal('1');
-                expect(object2Stub.methodD()).to.equal('2');
+                expect(stub.number()).to.equal(24);
+                expect(stub.string()).to.equal('bye');
             });
         });
 
-        
-        it('returns partial stub object with only "test" method stubbed when array with "test" has been given', () => {
-            const object = new class {
-                private r: string;
-                constructor() {
-                    this.r = 'run';
+        describe('when methods list is given', () => {
+            it('stubs ES6 object partially', () => {
+                class MyClass {
+                    private s: string;
+                    constructor() {
+                        this.s = 'hi';
+                    }
+                    number() {
+                        return 42;
+                    }
+                    string() {
+                        return this.s;
+                    }
                 }
+                
+                const object = new MyClass();
+                const stub = stubObject(object, ['number']);
+    
+                expect(stub.number()).to.be.undefined;
+                expect(stub.string()).to.equal('hi');
 
-                test() {
-                    return 123;
+                stub.number.returns(24);
+
+                expect(stub.number()).to.equal(24);
+                expect(stub.number).to.have.been.called;
+            });
+    
+            it('stubs literal object partially', () => {
+                const object = {
+                    number: () => {
+                        return 42;
+                    },
+                    string: () => {
+                        return 'hi';
+                    }
                 }
-
-                run() {
-                    return this.r;
-                }
-            }
-
-            const objectStub = stubObject(object, ['test']);
-
-            expect(objectStub.test()).to.be.undefined;
-            expect(objectStub.run()).to.equal('run');
-
-            expect(objectStub.test).to.have.been.called;
-        });
-
-        it('returns partial stub object with "run" method stubbed and returning "1" value when key value map { run: 1 } has been given', () => {
-            const object = new class {
-                test() {
-                    return 123;
-                }
-
-                run() {
-                    return 'run';
-                }
-            }
-            
-            const objectStub = stubObject(object, { 'run': 1 });
-
-            expect(objectStub.run()).to.equal(1);
-            expect(objectStub.test()).to.equal(123);
-
-            objectStub.run.returns('new run');
-            expect(objectStub.run()).to.equal('new run');
-
-            expect(objectStub.run).to.have.been.called;
+                
+                const stub = stubObject(object, ['number']);
+    
+                expect(stub.number()).to.be.undefined;
+                expect(stub.string()).to.equal('hi');
+    
+                stub.number.returns(24);
+                
+                expect(stub.number()).to.equal(24);
+                expect(stub.number).to.have.been.called;
+            });
         });
     });
-    describe('stubInterface', () => {
-        interface ITest {
-            method1(): void;
-            method2(num: number): string;
+
+    describe(stubConstructor.name, () => {
+        it('stubs all object constructor methods', () => {
+            class MyClass {
+                public greeting: string = 'hi';
+                constructor(private secret: string, public number: number) {}
+                add(a: number): number {
+                    return this.number + a;
+                }
+                string(): string {
+                    return this.secret;
+                }
+            }
+
+            const stub = stubConstructor(MyClass, 'some string', 0);
+            
+            expect(stub.greeting).to.equal('hi');
+            expect(stub.number).to.equal(0);
+            
+            expect(stub.string()).to.be.undefined;
+
+            stub.string.returns('bye');
+
+            expect(stub.string()).to.equal('bye');
+            expect(stub.string).to.have.been.called;
+
+            expect(stub.add(0)).to.be.undefined;
+            
+            stub.add.returns(42);
+
+            expect(stub.add(1)).to.equal(42);
+            expect(stub.add).to.have.been.calledWith(1);
+        });
+    });
+
+    describe(stubInterface.name, () => {
+        interface SomeInterface {
+            doSomething(): void;
+            numberToString(n: number): string;
         }
 
-        /** @deprecated @see stubInterface @docs */
-        it('returns stub object created from interface with all methods stubbed with "method2" predefined to return value of "abc" and "method1" which is testable with expect that has been called', () => {
-            const expectedMethod2Arg: number = 2;
-            const expectedMethod2ReturnValue = 'abc';
+        it('stubs all methods of an object constructed from the interface', () => {
+            const stub = stubInterface<SomeInterface>();
 
-            const interfaceStub: ITest = stubInterface<ITest>({
-                method2: expectedMethod2ReturnValue
-            });
+            expect(stub.numberToString(0)).to.be.undefined;
 
-            const object = new class {
-                test: ITest;
-                constructor(test: ITest) {
-                    this.test = test;
-                    this.test.method1();
-                }
-                run(num: number): string {
-                    return this.test.method2(num);
-                }
-            }(interfaceStub);
+            stub.numberToString.returns('0');
 
-            expect(object.run(expectedMethod2Arg)).to.equal(expectedMethod2ReturnValue);
-            expect(interfaceStub.method1).to.have.been.called;
-            expect(interfaceStub.method2).to.have.been.calledWith(expectedMethod2Arg);
-        });
+            const numberToStringValue = stub.numberToString(0);
 
-        /** @deprecated @see stubInterface @docs */
-        it('returns stub object created from interface with all methods stubbed including "method2" predefined to return "x" when method map to value { method: x } has been given', () => {
-            const interfaceStub: ITest = stubInterface<ITest>({
-                method2: 'test'
-            });
+            expect(stub.numberToString).to.have.been.calledWith(0);
+            expect(numberToStringValue).to.equal('0');
 
-            const object = new class {
-                test: ITest;
-                constructor(test: ITest) {
-                    this.test = test;
-                    this.test.method1();
-                }
-                run(num: number): string {
-                    return this.test.method2(num);
-                }
-            }(interfaceStub);
+            stub.doSomething();
 
-            expect(object.run(123)).to.equal('test');
-        });
-
-        it('gives an access to method stubs of the stub object created from interface', () => {
-            const expectedMethod2Arg = 2;
-            const expectedMethod2Value = 'string';
-
-            const interfaceStub = stubInterface<ITest>();
-
-            expect(interfaceStub.method2(1)).to.be.undefined;
-            interfaceStub.method2.returns(expectedMethod2Value);
-
-            const actualMethod2Value = interfaceStub.method2(expectedMethod2Arg);
-            interfaceStub.method1();
-
-            expect(interfaceStub.method2).to.have.been.calledWith(expectedMethod2Arg);
-            expect(actualMethod2Value).to.equal(expectedMethod2Value);
-            expect(interfaceStub.method1).to.have.been.called;
+            expect(stub.doSomething).to.have.been.called;
         });
 
         it('stubs method to return resolved Promise with another interface stub', async () => {
-            interface Test {
-                methodA(): Promise<ITest>;
+            interface MyInterface {
+                method(): Promise<SomeInterface>;
             }
 
-            const interfaceTestStub = stubInterface<Test>();
-            const interfaceITestStub = stubInterface<ITest>();
+            const myStub = stubInterface<MyInterface>();
+            const someStub = stubInterface<SomeInterface>();
 
-            interfaceTestStub.methodA.returns(Promise.resolve(interfaceITestStub));
+            myStub.method.returns(Promise.resolve(someStub));
 
-            expect(await interfaceTestStub.methodA()).to.equal(interfaceITestStub);
+            expect(await myStub.method()).to.equal(someStub);
         });
 
         it('stubs method to return rejected Promise with another interface stub', async () => {
-            interface Test {
-                methodA(): Promise<ITest>;
+            interface MyInterface {
+                method(): Promise<SomeInterface>;
             }
 
-            const interfaceTestStub = stubInterface<Test>();
-            const interfaceITestStub = stubInterface<ITest>();
+            const myStub = stubInterface<MyInterface>();
+            const someStub = stubInterface<SomeInterface>();
 
-            interfaceTestStub.methodA.returns(Promise.reject(interfaceITestStub));
+            myStub.method.returns(Promise.reject(someStub));
 
             try {
-                await interfaceTestStub.methodA();
+                await myStub.method();
             } catch (e) {
-                expect(e).to.equal(interfaceITestStub);
+                expect(e).to.equal(someStub);
             }
-        });
-    });         
-    
-    describe('stubConstructor', () => {
-        it('stubs all object constructor methods', () => {
-            class A {
-                private pp = 5;
-                public ps: string = "x";
-
-                constructor(private pt: string, public px: number, y: boolean) {}
-                
-                method1(): string {
-                    return 'value1';
-                }
-                method2(x: number): number {
-                    return 13;
-                }
-            }
-            const expectedNewMethod1Value = 'new value';
-            const expectedNewMethod2Value = 43;
-            const expectedMethod2Argument = 111;
-            const expectedPxPassedToConstructor = 4;
-
-            const stub = stubConstructor(A, "a", expectedPxPassedToConstructor, true);
-            
-            expect(stub.ps).to.equal("x");
-            expect(stub.px).to.equal(expectedPxPassedToConstructor);
-            expect(stub.method1()).to.be.undefined;
-            expect(stub.method2(expectedMethod2Argument)).to.be.undefined;
-
-            stub.method1.returns(expectedNewMethod1Value);
-            stub.method2.returns(expectedNewMethod2Value);
-            expect(stub.method2).to.have.been.calledWith(expectedMethod2Argument);
-
-            expect(stub.method1()).to.equal(expectedNewMethod1Value);
-            expect(stub.method2(222)).to.equal(expectedNewMethod2Value);
-            expect(stub.method2).to.have.been.calledWith(222);
         });
     });
 });
