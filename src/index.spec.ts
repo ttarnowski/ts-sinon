@@ -9,7 +9,7 @@ chai.use(sinonChai);
 describe('ts-sinon', () => {
     describe(stubObject.name, () => {
         describe('when methods list is not given', () => {
-            it('stubs all methods of an ES6 object', () => {
+            it('stubs all methods of an ES6 class', () => {
                 class MyClass {
                     number() {
                         return 42;
@@ -29,7 +29,7 @@ describe('ts-sinon', () => {
                 expect(stub.number).to.have.been.called;
             });
 
-            it('allows to change ES6 object stub values', () => {
+            it(`allows to change ES6 class instance stub values`, () => {
                 class MyClass {
                     number() {
                         return 42;
@@ -49,7 +49,7 @@ describe('ts-sinon', () => {
                 expect(stub.string()).to.equal('bye');
             });
     
-            it('stubs all methods of a literal object', () => {
+            it('stubs all methods of an object literal', () => {
                 const object = {
                     number: () => {
                         return 42;
@@ -68,7 +68,7 @@ describe('ts-sinon', () => {
                 expect(stub.string).to.have.been.called;
             });
 
-            it('allows to change literal object stub values', () => {
+            it(`allows to change am object literal stub values`, () => {
                 const object = {
                     number: () => {
                         return 42;
@@ -89,7 +89,7 @@ describe('ts-sinon', () => {
         });
 
         describe('when methods list is given', () => {
-            it('stubs ES6 object partially', () => {
+            it('stubs given methods of an ES6 class', () => {
                 class MyClass {
                     private s: string;
                     constructor() {
@@ -115,7 +115,7 @@ describe('ts-sinon', () => {
                 expect(stub.number).to.have.been.called;
             });
     
-            it('stubs literal object partially', () => {
+            it('stubs given methods of an object literal', () => {
                 const object = {
                     number: () => {
                         return 42;
@@ -139,7 +139,7 @@ describe('ts-sinon', () => {
     });
 
     describe(stubConstructor.name, () => {
-        it('stubs all object constructor methods', () => {
+        it('stubs all methods using an ES6 class constructor', () => {
             class MyClass {
                 public greeting: string = 'hi';
                 constructor(private secret: string, public number: number) {}
@@ -174,8 +174,8 @@ describe('ts-sinon', () => {
 
     describe(stubInterface.name, () => {
         interface SomeInterface {
-            doSomething(): void;
             numberToString(n: number): string;
+            doSomething(): void;
         }
 
         it('stubs all methods of an object constructed from the interface', () => {
@@ -195,7 +195,7 @@ describe('ts-sinon', () => {
             expect(stub.doSomething).to.have.been.called;
         });
 
-        it('stubs method to return resolved Promise with another interface stub', async () => {
+        it(`stubs a method which returns a resolved Promise with another interface's stub`, async () => {
             interface MyInterface {
                 method(): Promise<SomeInterface>;
             }
@@ -208,7 +208,7 @@ describe('ts-sinon', () => {
             expect(await myStub.method()).to.equal(someStub);
         });
 
-        it('stubs method to return rejected Promise with another interface stub', async () => {
+        it(`stubs a method which returns a rejected Promise with another interface's stub`, async () => {
             interface MyInterface {
                 method(): Promise<SomeInterface>;
             }

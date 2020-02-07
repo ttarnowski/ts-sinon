@@ -6,7 +6,7 @@ const excludedMethods: string[] = Object.getOwnPropertyNames(Object.getPrototype
 
 export type StubbedInstance<T> = sinon.SinonStubbedInstance<T> & T;
 
-export function stubObject<T extends object>(object: T, onlyTheseMethods?: string[]): StubbedInstance<T> {
+export function stubObject<T extends object, K extends keyof T>(object: T, onlyTheseMethods?: K[]): StubbedInstance<T> {
     const stubbedObject = Object.assign(<sinon.SinonStubbedInstance<T>> {}, object);
     const objectMethods = Object.getOwnPropertyNames(Object.getPrototypeOf(object));
 
@@ -24,7 +24,7 @@ export function stubObject<T extends object>(object: T, onlyTheseMethods?: strin
 
     if (onlyTheseMethods && onlyTheseMethods.length > 0) {
         for (const method of onlyTheseMethods) {
-            stubbedObject[method] = sinon.stub();
+            stubbedObject[<string>method] = sinon.stub();
         }
     } else {
         for (const method of objectMethods) {
@@ -38,13 +38,13 @@ export function stubObject<T extends object>(object: T, onlyTheseMethods?: strin
 }
 
 export function stubConstructor<T extends new (...args: any[]) => any>(
-    constructor: T, ...constructorArgs: ConstructorParameters<T> | undefined[]
+    constructor: T, ...constructorArgs: ConstructorParameters<T>
 ): StubbedInstance<InstanceType<T>> {
     return stubObject(new constructor(...constructorArgs));
 }
 
 export function stubInterface<T extends object>(): StubbedInstance<T> {
-    const object = stubObject<T>(<T> {});
+    const object = stubObject(<T> {});
         
     const proxy = new Proxy(object, {
         get: (target, property) => {
