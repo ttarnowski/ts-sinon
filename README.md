@@ -194,7 +194,7 @@ expect(stub.someVar).to.equal(24);
 
 ```javascript
 class MyClass {
-    constructor(public foobar: string, xyzzy: boolean) {}
+    constructor(public foobar: string, public xyzzy: boolean) {}
 }
 
 // only allows passing arguments of correct type

@@ -384,4 +384,130 @@ describe('ts-sinon', () => {
             }
         });
     });
+
+    describe('examples in readme', () => {
+        describe('object method stubbing', () => {
+            it('stub all object methods', () => {
+                class MyClass {
+                    method() { return 'original' }
+                }
+                
+                const instance = new MyClass();
+                const stub = stubObject(instance);
+                
+                stub.method.returns('stubbed');
+                
+                expect(stub.method()).to.equal('stubbed');
+            });
+
+            it('stub only some methods', () => {
+                class MyClass {
+                    methodA() { return 'A: original' }
+                    methodB() { return 'B: original' }
+                }
+                
+                const instance = new MyClass();
+                const stub = stubObject(instance, ['methodA']);
+                
+                expect(stub.methodA()).to.be.undefined;
+                expect(stub.methodB()).to.equal('B: original');
+            });
+        });
+
+        describe('object method replacement', () => {
+            it('replace all object methods', () => {
+                class MyClass {
+                    method() { return 'original' }
+                }
+                
+                const instance = new MyClass();
+                const stub = replaceObject(instance);
+                
+                stub.method.returns('stubbed');
+                
+                // note: calling the instance instead of the stub
+                expect(instance.method()).to.equal('stubbed');
+                
+                stub.restore();
+                
+                expect(instance.method()).to.equal('original');
+            });
+            
+            it('replace only some methods', () => {
+                class MyClass {
+                    methodA() { return 'A: original' }
+                    methodB() { return 'B: original' }
+                }
+                
+                const instance = new MyClass();
+                const stub = replaceObject(instance, ['methodA']);
+                
+                // note: calling the instance instead of the stub
+                expect(instance.methodA()).to.be.undefined;
+                expect(instance.methodB()).to.equal('B: original');
+                
+                stub.restore();
+                
+                expect(instance.methodA()).to.equal('A: original');
+            });
+        });
+
+        describe('object constructor stubbing', () => {
+            describe('stub all object methods', () => {
+                it('without passing predefined arguments to the constructor', () => {
+                    class MyClass {
+                        public someVar: number = 42;
+                    
+                        method(): string {
+                            return 'original';
+                        }
+                    }
+
+                    const stub = stubConstructor(MyClass);
+
+                    // stub methods
+                    expect(stub.method()).to.be.undefined;
+
+                    stub.method.returns('stubbed');
+
+                    expect(stub.method()).to.equal('stubbed');
+
+                    // stub other properties
+                    expect(stub.someVar).to.equal(42);
+
+                    stub.someVar = 24;
+
+                    expect(stub.someVar).to.equal(24);
+                });
+            
+                it('by passing predefined arguments to the constructor', () => {
+                    class MyClass {
+                        constructor(public foobar: string, public xyzzy: boolean) {}
+                    }
+                    
+                    // only allows passing arguments of correct type
+                    const stub = stubConstructor(MyClass, 'string', true);
+                    
+                    expect(stub.foobar).to.equal('string');
+                    expect(stub.xyzzy).to.equal(true);
+                });
+            });
+        });
+
+        describe('interface stubbing', () => {
+            it('stub all interface methods', () => {
+                interface MyInterface {
+                    method(): string;
+                }
+                
+                const stub = stubInterface<MyInterface>();
+                
+                expect(stub.method()).to.be.undefined;
+                
+                stub.method.returns('stubbed');
+                
+                expect(stub.method()).to.equal('stubbed');
+            });
+        });
+    });
 });
