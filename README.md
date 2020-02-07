@@ -2,9 +2,11 @@
 
 [`sinon`](https://github.com/sinonjs/sinon) extension providing functions to:
 
-- stub object methods
+- stub or replace object methods
 - stub object constructors
 - stub interfaces
+
+in Typescript.
 
 ## Prerequisites
 
@@ -19,7 +21,7 @@ npm install --save-dev ts-sinon
 yarn add --dev ts-sinon
 ```
 
-## Object stubbing
+## Object method stubbing
 
 ### Importing
 
@@ -69,6 +71,70 @@ const stub = stubObject(instance, ['methodA']);
 
 expect(stub.methodA()).to.be.undefined;
 expect(stub.methodB()).to.equal('B: original');
+```
+
+## Object method replacement
+
+`sinon` allows us to [replace object methods](https://sinonjs.org/releases/v8.1.1/stubs/#var-stub--sinonstubobject-method).
+
+### Importing
+
+Importing the `replaceObject` function:
+
+- as a single function:
+
+```javascript
+import { replaceObject } from 'ts-sinon';
+```
+
+- as part of the module:
+
+```javascript
+import * as tsSinon from 'ts-sinon';
+
+const replaceObject = tsSinon.replaceObject;
+```
+
+### Examples
+
+Replace all object methods:
+
+```javascript
+class MyClass {
+    method() { return 'original' }
+}
+
+const instance = new MyClass();
+const stub = replaceObject(instance);
+
+stub.method.returns('stubbed');
+
+// note: calling the instance instead of the stub
+expect(instance.method()).to.equal('stubbed');
+
+stub.restore();
+
+expect(instance.method()).to.equal('original');
+```
+
+Replace only some methods:
+
+```javascript
+class MyClass {
+    methodA() { return 'A: original' }
+    methodB() { return 'B: original' }
+}
+
+const instance = new MyClass();
+const stub = replaceObject(instance, ['methodA']);
+
+// note: calling the instance instead of the stub
+expect(instance.methodA()).to.be.undefined;
+expect(instance.methodB()).to.equal('B: original');
+
+stub.restore();
+
+expect(instance.methodA()).to.equal('A: original');
 ```
 
 ## Object constructor stubbing
