@@ -37,9 +37,9 @@ export function stubObject<T extends object, K extends keyof T>(object: T, onlyT
     return stubbedObject;
 }
 
-type Restoreable<T> = StubbedInstance<T> & { restore(): void }
+export type ReplacedInstance<T> = StubbedInstance<T> & { restore(): void }
 
-export function replaceObject<T extends object, K extends keyof T>(object: T, onlyTheseMethods?: K[]): Restoreable<T> {
+export function replaceObject<T extends object, K extends keyof T>(object: T, onlyTheseMethods?: K[]): ReplacedInstance<T> {
     const stubbedObject = Object.assign(<sinon.SinonStubbedInstance<T>> {}, object);
     const objectPrototypeMethods = Object.getOwnPropertyNames(Object.getPrototypeOf(object))
         .filter(attr => typeof object[attr] === 'function');
