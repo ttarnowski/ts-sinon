@@ -37,7 +37,7 @@ export function stubObject<T extends object, K extends keyof T>(object: T, onlyT
     return stubbedObject;
 }
 
-export type ReplacedInstance<T> = StubbedInstance<T> & { restore(): void }
+export type ReplacedInstance<T> = sinon.SinonStubbedInstance<T> & T & { restore(): void }
 
 export function replaceObject<T extends object, K extends keyof T>(object: T, onlyTheseMethods?: K[]): ReplacedInstance<T> {
     const stubbedObject = Object.assign(<sinon.SinonStubbedInstance<T>> {}, object);
