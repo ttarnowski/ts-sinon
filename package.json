@@ -1,6 +1,6 @@
 {
   "name": "ts-sinon",
-  "version": "1.2.0",
+  "version": "1.0.25",
   "description": "Sinon library extension to stub objects and interfaces in TypeScript",
   "author": {
     "name": "Tomasz Tarnowski",
