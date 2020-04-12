@@ -41,7 +41,7 @@
     "@types/node": "^11.15.10",
     "@types/sinon": "^7.5.2",
     "@types/sinon-chai": "^3.2.4",
-    "sinon": "^7.5.0"
+    "sinon": "^9.0.2"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
