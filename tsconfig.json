@@ -13,7 +13,6 @@
         "out": "docs"
     },
     "include": [
-        "src/**/*.ts"
-    ],
-    "exclude": ["node_modules", "dist", "./src/index.spec.ts"]
+        "src/index.ts"
+    ]
 }
