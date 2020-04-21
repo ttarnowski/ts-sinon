@@ -38,7 +38,7 @@
     "test": "./node_modules/.bin/mocha -r ts-node/register ./src/index.spec.ts"
   },
   "dependencies": {
-    "@types/node": "^11.15.10",
+    "@types/node": "^13.13.1",
     "@types/sinon": "^9.0.0",
     "@types/sinon-chai": "^3.2.4",
     "sinon": "^9.0.2"
