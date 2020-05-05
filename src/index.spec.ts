@@ -1,8 +1,8 @@
 import * as chai from "chai";
 import * as sinonChai from "sinon-chai";
+import * as sinon from "sinon";
 
-import { stubObject, stubInterface, stubConstructor } from "./index";
-import * as s from "./index"
+import { stubObject, stubInterface, stubConstructor, stubObjectWithStubLib, stubInterfaceWithStubLib, stubConstructorWithStubLib } from "./index";
 
 chai.use(sinonChai);
 const expect = chai.expect;
@@ -15,26 +15,26 @@ describe('ts-sinon', () => {
                     test() {
                         return 123;
                     }
-    
+
                     run() {
                         return 'run';
                     }
                 }
 
                 const object = new A();
-    
+
                 const objectStub = stubObject<A>(object);
-    
+
                 expect(object.test()).to.equal(123);
                 expect(object.run()).to.equal('run');
-    
+
                 expect(objectStub.test()).to.be.undefined;
                 expect(objectStub.run()).to.be.undefined;
-    
+
                 expect(objectStub.run).to.have.been.called;
                 expect(objectStub.test).to.have.been.called;
             });
-    
+
             it('returns stub literal object with all methods stubbed', () => {
                 const object = {
                     test: () => {
@@ -44,15 +44,15 @@ describe('ts-sinon', () => {
                         return 'run';
                     }
                 };
-    
+
                 const objectStub = stubObject(object);
-    
+
                 expect(object.test()).to.equal(123);
                 expect(object.run()).to.equal('run');
-    
+
                 expect(objectStub.test()).to.be.undefined;
                 expect(objectStub.run()).to.be.undefined;
-    
+
                 expect(objectStub.run).to.have.been.called;
                 expect(objectStub.test).to.have.been.called;
             });
@@ -94,7 +94,7 @@ describe('ts-sinon', () => {
             });
         });
 
-        
+
         it('returns partial stub object with only "test" method stubbed when array with "test" has been given', () => {
             const object = new class {
                 private r: string;
@@ -129,7 +129,7 @@ describe('ts-sinon', () => {
                     return 'run';
                 }
             }
-            
+
             const objectStub = stubObject(object, { 'run': 1 });
 
             expect(objectStub.run()).to.equal(1);
@@ -140,7 +140,22 @@ describe('ts-sinon', () => {
 
             expect(objectStub.run).to.have.been.called;
         });
+
+        it('uses the stubLib', () => {
+            class DummyClass {
+                dummyMethod() { }
+            }
+            const dummyObject = new DummyClass()
+            const sandbox = sinon.createSandbox()
+            const dummyObjectStub = stubObjectWithStubLib(dummyObject, sandbox)
+
+            dummyObjectStub.dummyMethod()
+            sandbox.reset()
+
+            expect(dummyObjectStub.dummyMethod).to.be.not.called
+        })
     });
+
     describe('stubInterface', () => {
         interface ITest {
             method1(): void;
@@ -238,16 +253,30 @@ describe('ts-sinon', () => {
                 expect(e).to.equal(interfaceITestStub);
             }
         });
-    });         
-    
+
+        it('uses the stubLib', () => {
+            interface DummyInterface {
+                dummyMethod(): () => void
+            }
+
+            const sandbox = sinon.createSandbox()
+            const dummyStubInstance = stubInterfaceWithStubLib<DummyInterface>(sandbox)
+
+            dummyStubInstance.dummyMethod()
+            sandbox.reset()
+
+            expect(dummyStubInstance.dummyMethod).to.be.not.called
+        })
+    });
+
     describe('stubConstructor', () => {
         it('stubs all object constructor methods', () => {
             class A {
                 private pp = 5;
                 public ps: string = "x";
 
-                constructor(private pt: string, public px: number, y: boolean) {}
-                
+                constructor(private pt: string, public px: number, y: boolean) { }
+
                 method1(): string {
                     return 'value1';
                 }
@@ -261,7 +290,7 @@ describe('ts-sinon', () => {
             const expectedPxPassedToConstructor = 4;
 
             const stub = stubConstructor(A, "a", expectedPxPassedToConstructor, true);
-            
+
             expect(stub.ps).to.equal("x");
             expect(stub.px).to.equal(expectedPxPassedToConstructor);
             expect(stub.method1()).to.be.undefined;
@@ -275,5 +304,20 @@ describe('ts-sinon', () => {
             expect(stub.method2(222)).to.equal(expectedNewMethod2Value);
             expect(stub.method2).to.have.been.calledWith(222);
         });
+
+        it('uses the stubLib', () => {
+            class DummyClass {
+                constructor(private argument: string) { }
+                dummyMethod() { }
+            }
+
+            const sandbox = sinon.createSandbox()
+            const dummyStubObject = stubConstructorWithStubLib(DummyClass, sandbox, 'dummyArgument')
+
+            dummyStubObject.dummyMethod()
+            sandbox.reset()
+
+            expect(dummyStubObject.dummyMethod).to.be.not.called
+        })
     });
 });
