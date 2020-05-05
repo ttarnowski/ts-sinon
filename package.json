@@ -35,7 +35,7 @@
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
-    "test": "./node_modules/.bin/mocha -r ts-node/register ./src/index.spec.ts"
+    "test": "./node_modules/.bin/mocha -r ts-node/register ./src/*.spec.ts"
   },
   "dependencies": {
     "@types/node": "^11.15.10",
