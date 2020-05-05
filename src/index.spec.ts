@@ -2,7 +2,9 @@ import * as chai from "chai";
 import * as sinonChai from "sinon-chai";
 import * as sinon from "sinon";
 
-import { stubObject, stubInterface, stubConstructor, stubObjectWithStubLib, stubInterfaceWithStubLib, stubConstructorWithStubLib } from "./index";
+import { stubObject, stubInterface, stubConstructor, stubObjectWithStubLib, stubInterfaceWithStubLib, stubConstructorWithStubLib, createExtendedSandbox } from "./index";
+import { ExtendedSandboxProxy } from "./ExtendedSandboxProxy";
+import * as ExtendedSandboxProxyLib from "./ExtendedSandboxProxy";
 
 chai.use(sinonChai);
 const expect = chai.expect;
@@ -320,4 +322,36 @@ describe('ts-sinon', () => {
             expect(dummyStubObject.dummyMethod).to.be.not.called
         })
     });
+
+    describe('createExtendedSandbox', function () {
+        let createSandboxStub: sinon.SinonStub;
+        let sandboxStubInstance: sinon.SinonStubbedInstance<sinon.SinonSandbox>
+        let extendedSandboxProxyStubInstance: sinon.SinonStubbedInstance<ExtendedSandboxProxy>;
+        let extendedSandboxProxyStub: sinon.SinonStub;
+
+        const config = {
+        } as Partial<sinon.SinonSandboxConfig>
+
+        before(function () {
+            sandboxStubInstance = stubInterface<sinon.SinonSandbox>();
+            createSandboxStub = sinon.stub(sinon, 'createSandbox');
+            createSandboxStub.returns(sandboxStubInstance);
+            extendedSandboxProxyStubInstance = sinon.createStubInstance(ExtendedSandboxProxy);
+            extendedSandboxProxyStub = sinon.stub(ExtendedSandboxProxyLib, 'ExtendedSandboxProxy');
+            extendedSandboxProxyStub.returns(extendedSandboxProxyStubInstance);
+        })
+
+        after(function () {
+            createSandboxStub.restore();
+            extendedSandboxProxyStub.restore();
+        })
+
+        it('creates a sinon sandbox and passes it to ExtendedSandboxProxy', function () {
+            const actualSandbox = createExtendedSandbox(config);
+
+            expect(createSandboxStub).to.be.calledWith(config);
+            expect(extendedSandboxProxyStub).to.be.calledWith(sandboxStubInstance);
+            expect(actualSandbox).to.equal(extendedSandboxProxyStubInstance);
+        })
+    })
 });

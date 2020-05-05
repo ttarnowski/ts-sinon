@@ -1,5 +1,7 @@
 import * as sinon from "sinon";
 
+import { ExtendedSandboxProxy } from "./ExtendedSandboxProxy"
+
 export type StubbedInstance<T> = sinon.SinonStubbedInstance<T> & T;
 export type StubLib = {
     stub: sinon.SinonStubStatic
@@ -97,7 +99,12 @@ export function stubInterface<T extends object>(methods: object = {}): StubbedIn
     return stubInterfaceWithStubLib<T>(sinon, methods);
 }
 
+export function createExtendedSandbox(config?: Partial<sinon.SinonSandboxConfig>): ExtendedSandboxProxy {
+    return new ExtendedSandboxProxy(sinon.createSandbox(config));
+}
+
 sinon['stubObject'] = stubObject;
 sinon['stubInterface'] = stubInterface;
+sinon['createExtendedSandbox'] = createExtendedSandbox;
 
 export default sinon;
