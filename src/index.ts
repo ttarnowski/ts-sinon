@@ -23,7 +23,7 @@ export function stubObject<T extends object>(object: T, methods?: ObjectMethodsK
     ];
 
     for (let method in object) {
-        if (object.hasOwnProperty(method) && typeof object[method] == "function") {
+        if (typeof object[method] == "function") {
             objectMethods.push(method);
         }
     }    
@@ -40,10 +40,8 @@ export function stubObject<T extends object>(object: T, methods?: ObjectMethodsK
         }
     } else if (typeof methods == "object") {
         for (let method in methods) {
-            if (methods.hasOwnProperty(method)) {
-                stubObject[<string>method] = sinon.stub();
-                stubObject[<string>method].returns(methods[method]);
-            }
+            stubObject[<string>method] = sinon.stub();
+            stubObject[<string>method].returns(methods[method]);
         }
     } else {
         for (let method of objectMethods) {
