@@ -26,7 +26,7 @@ import { stubObject } from "ts-sinon";
 ```
 
 - import as part of sinon singleton:
-```javascript
+```typescript
 import * as sinon from "ts-sinon";
 
 const stubObject = sinon.stubObject;
@@ -34,57 +34,59 @@ const stubObject = sinon.stubObject;
 
 Stub all object methods:
 
-```javascript
+```typescript
 class Test {
-    method() { return 'original' }
+    method() { return "original" }
 }
 
 const test = new Test();
 const testStub = stubObject<Test>(test);
 
-testStub.method.returns('stubbed');
+testStub.method.returns("stubbed");
 
-expect(testStub.method()).to.equal('stubbed');
+expect(testStub.method()).to.equal("stubbed");
 ```
 
 Partial stub:
 
-```javascript
+```typescript
 class Test {
-    methodA() { return 'A: original' }
-    methodB() { return 'B: original' }
+    public someProp: string = "test";
+    methodA() { return "A: original" }
+    methodB() { return "B: original" }
 }
 
 const test = new Test();
-const testStub = stubObject<Test>(test, ['methodA']);
+// second argument must be existing class method name, in this case only "methodA" or "methodB" are accepted.
+const testStub = stubObject<Test>(test, ["methodA"]);
 
 expect(testStub.methodA()).to.be.undefined;
-expect(testStub.methodB()).to.equal('B: original');
+expect(testStub.methodB()).to.equal("B: original");
 ```
 
-Stub with predefined return values (deprecated - see the deprecation note):
+Stub with predefined return values (type-safe):
 
-```javascript
+```typescript
 class Test {
-    method() { return 'original' }
+    method() { return "original" }
 }
 
 const test = new Test();
-const testStub = stubObject<Test>(test, { method: 'stubbed' });
+const testStub = stubObject<Test>(test, { method: "stubbed" });
 
-expect(testStub.method()).to.equal('stubbed');
+expect(testStub.method()).to.equal("stubbed");
 ```
 ## Interface stubs example
 
 Importing stubInterface function:
 
 - import single function:
-```javascript
+```typescript
 import { stubInterface } from "ts-sinon";
 ```
 
 - import as part of sinon singleton:
-```javascript
+```typescript
 import * as sinon from "ts-sinon";
 
 const stubInterface = sinon.stubInterface;
@@ -92,7 +94,7 @@ const stubInterface = sinon.stubInterface;
 
 Interface stub (stub all methods):
 
-```javascript
+```typescript
 interface Test {
     method(): string;
 }
@@ -101,21 +103,22 @@ const testStub = stubInterface<Test>();
 
 expect(testStub.method()).to.be.undefined;
 
-testStub.method.returns('stubbed');
+testStub.method.returns("stubbed");
 
-expect(testStub.method()).to.equal('stubbed');
+expect(testStub.method()).to.equal("stubbed");
 ```
 
-Interface stub with predefined return values (deprecated - see the deprecation note):
+Interface stub with predefined return values (type-safe):
 
-```javascript
+```typescript
 interface Test {
     method(): string;
 }
 
-const testStub = stubInterface<Test>({ method: 'stubbed' });
+// method property has to be the same type as method() return type
+const testStub = stubInterface<Test>({ method: "stubbed" });
 
-expect(testStub.method()).to.equal('stubbed');
+expect(testStub.method()).to.equal("stubbed");
 ```
 
 ## Object constructor stub example
@@ -123,12 +126,12 @@ expect(testStub.method()).to.equal('stubbed');
 Importing stubConstructor function:
 
 - import single function:
-```javascript
+```typescript
 import { stubConstructor } from "ts-sinon";
 ```
 
 - import as part of sinon singleton:
-```javascript
+```typescript
 import * as sinon from "ts-sinon";
 
 const stubConstructor = sinon.stubConstructor;
@@ -137,12 +140,12 @@ const stubConstructor = sinon.stubConstructor;
 Object constructor stub (stub all methods):
 
 - without passing predefined args to the constructor:
-```javascript
+```typescript
 class Test {
     public someVar: number = 10;
 
     method(): string {
-        return 'value';
+        return "value";
     }
 }
 
@@ -151,9 +154,9 @@ const testStub = stubConstructor(Test);
 
 expect(testStub.method()).to.be.undefined;
 
-testStub.method.returns('stubbed');
+testStub.method.returns("stubbed");
 
-expect(testStub.method()).to.equal('stubbed');
+expect(testStub.method()).to.equal("stubbed");
 
 expect(testStub.someVar).to.equal(10);
 
@@ -163,7 +166,7 @@ expect(testStub.someVar).to.equal(20);
 ```
 
 - with passing predefined args to the constructor:
-```javascript
+```typescript
 class Test {
     constructor(public someVar: string, y: boolean) {}
 
@@ -171,36 +174,16 @@ class Test {
 }
 
 // it won't allow to pass incorrect args
-const testStub = stubConstructor(Test, "someVar value", true);
+const testStub = stubConstructor(Test, "someValue", true);
 
 expect(testStub.someVar).to.equal("someValue");
-```
-
-## Method map argument deprecation note
-
-Due to a potential risk of overwriting return value type of stubbed method (that won't be caught by TypeScript compiler) I have decided to mark it as deprecated.
-Please look at the following example of type overwriting using method map:
-
-```javascript
-interface ITest {
-    method1(): void;
-    method2(num: number): string;
-}
-
-const interfaceStub: ITest = stubInterface<ITest>({
-    method2: 12345
-});
-
-// following expression will assign 12345 value of type number to v variable which is incorrect (it will compile without an error)
-const v: string = interfaceStub.method2(1);
-
 ```
 
 ## Sinon methods
 
 By importing 'ts-sinon' you have access to all sinon methods.
 
-```javascript
+```typescript
 import sinon, { stubInterface } from "ts-sinon";
 
 const functionStub = sinon.stub();
@@ -210,7 +193,7 @@ const spy = sinon.spy();
 
 or
 
-```javascript
+```typescript
 import * as tsSinon from "ts-sinon"
 
 const functionStub = tsSinon.default.stub();

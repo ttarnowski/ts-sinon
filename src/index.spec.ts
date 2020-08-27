@@ -119,20 +119,20 @@ describe('ts-sinon', () => {
             expect(objectStub.test).to.have.been.called;
         });
 
-        it('returns partial stub object with "run" method stubbed and returning "1" value when key value map { run: 1 } has been given', () => {
+        it('returns partial stub object with "run" method stubbed and returning "some val" value when key value map { run: "some val" } has been given', () => {
             const object = new class {
                 test() {
                     return 123;
                 }
 
                 run() {
-                    return 'run';
+                    return "run";
                 }
             }
             
-            const objectStub = stubObject(object, { 'run': 1 });
+            const objectStub = stubObject(object, { "run": "some val" });
 
-            expect(objectStub.run()).to.equal(1);
+            expect(objectStub.run()).to.equal("some val");
             expect(objectStub.test()).to.equal(123);
 
             objectStub.run.returns('new run');
@@ -143,17 +143,25 @@ describe('ts-sinon', () => {
     });
     describe('stubInterface', () => {
         interface ITest {
+            prop1: string;
             method1(): void;
             method2(num: number): string;
         }
 
-        /** @deprecated @see stubInterface @docs */
+        it("sets an \"x\" value on \"prop1\" property", () => {
+           const stub = stubInterface<ITest>();
+
+           stub.prop1 = "x";
+
+           expect(stub.prop1).to.equal("x");
+        });
+
         it('returns stub object created from interface with all methods stubbed with "method2" predefined to return value of "abc" and "method1" which is testable with expect that has been called', () => {
             const expectedMethod2Arg: number = 2;
             const expectedMethod2ReturnValue = 'abc';
 
             const interfaceStub: ITest = stubInterface<ITest>({
-                method2: expectedMethod2ReturnValue
+                method2: expectedMethod2ReturnValue,
             });
 
             const object = new class {
@@ -172,7 +180,6 @@ describe('ts-sinon', () => {
             expect(interfaceStub.method2).to.have.been.calledWith(expectedMethod2Arg);
         });
 
-        /** @deprecated @see stubInterface @docs */
         it('returns stub object created from interface with all methods stubbed including "method2" predefined to return "x" when method map to value { method: x } has been given', () => {
             const interfaceStub: ITest = stubInterface<ITest>({
                 method2: 'test'

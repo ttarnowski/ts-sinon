@@ -2,10 +2,18 @@ import * as sinon from "sinon";
 
 export type StubbedInstance<T> = sinon.SinonStubbedInstance<T> & T;
 
-/**
- * @param methods passing map of methods has become @deprecated as it may lead to overwriting stubbed method type
- */
-export function stubObject<T extends object>(object: T, methods?: string[] | object): StubbedInstance<T> {
+export type AllowedKeys<T, Condition> = {
+    [Key in keyof T]:
+    T[Key] extends Condition ? Key : never
+}[keyof T];
+
+export type ObjectMethodsKeys<T> = AllowedKeys<T, (...args: any[]) => any>[];
+
+export type ObjectMethodsMap<T> = {
+  [Key in keyof T]?: T[Key] extends (...args: any[]) => any ? ReturnType<T[Key]> : never;
+};
+
+export function stubObject<T extends object>(object: T, methods?: ObjectMethodsKeys<T> | ObjectMethodsMap<T>): StubbedInstance<T> {
     const stubObject = Object.assign(<sinon.SinonStubbedInstance<T>> {}, object);
     const objectMethods = Object.getOwnPropertyNames(Object.getPrototypeOf(object));
     const excludedMethods: string[] = [
@@ -15,7 +23,7 @@ export function stubObject<T extends object>(object: T, methods?: string[] | obj
     ];
 
     for (let method in object) {
-        if (typeof object[method] == "function") {
+        if (object.hasOwnProperty(method) && typeof object[method] == "function") {
             objectMethods.push(method);
         }
     }    
@@ -28,12 +36,14 @@ export function stubObject<T extends object>(object: T, methods?: string[] | obj
 
     if (Array.isArray(methods)) {
         for (let method of methods) {
-            stubObject[method] = sinon.stub();
+            stubObject[<string>method] = sinon.stub();
         }
     } else if (typeof methods == "object") {
         for (let method in methods) {
-            stubObject[method] = sinon.stub();
-            stubObject[method].returns(methods[method]);
+            if (methods.hasOwnProperty(method)) {
+                stubObject[<string>method] = sinon.stub();
+                stubObject[<string>method].returns(methods[method]);
+            }
         }
     } else {
         for (let method of objectMethods) {
@@ -53,23 +63,18 @@ export function stubConstructor<T extends new (...args: any[]) => any>(
     return stubObject(new constructor(...constructorArgs));
 }
 
-/**
- * @param methods passing map of methods has become @deprecated as it may lead to overwriting stubbed method type
- */
-export function stubInterface<T extends object>(methods: object = {}): StubbedInstance<T> {
+export function stubInterface<T extends object>(methods: ObjectMethodsMap<T> = {}): StubbedInstance<T> {
     const object = stubObject<T>(<T> {}, methods);
         
-    const proxy = new Proxy(object, {
+    return new Proxy(object, {
         get: (target, name) => {
-            if (!target[name] && name !== 'then') {
+            if (!target.hasOwnProperty(name) && name !== 'then') {
                 target[name] = sinon.stub();
             }
 
             return target[name];
         }
     })
-
-    return proxy;
 }
 
 sinon['stubObject'] = stubObject;
