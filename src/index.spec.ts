@@ -284,7 +284,6 @@ describe('ts-sinon', () => {
         });
 
         it('stubs all object methods with inheritance', () => {
-          
           class B {
               methodB(): string {
                   return 'B';
@@ -302,7 +301,6 @@ describe('ts-sinon', () => {
           const expectedNewMethod2Value = 43;
           const expectedMethodBValue = 'new B value';
           const expectedMethod2Argument = 111;
-
 
           const stub = stubConstructor(A);
           
