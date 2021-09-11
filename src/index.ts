@@ -76,9 +76,9 @@ export function stubInterface<T extends object>(methods: ObjectMethodsMap<T> = {
 }
 
 function getObjectMethods(object: object): Array<string> {
-    let methods: Array<string> = [];
+    const methods: Array<string> = [];
     while ((object = Reflect.getPrototypeOf(object))) {
-        let keys = Reflect.ownKeys(object);
+        const keys = Reflect.ownKeys(object);
         keys.forEach((key) => {
             if (typeof key === 'string') {
               methods.push(key);
