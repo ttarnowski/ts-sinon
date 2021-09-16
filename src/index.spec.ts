@@ -282,5 +282,41 @@ describe('ts-sinon', () => {
             expect(stub.method2(222)).to.equal(expectedNewMethod2Value);
             expect(stub.method2).to.have.been.calledWith(222);
         });
+
+        it('stubs all object methods with inheritance', () => {
+          class B {
+              methodB(): string {
+                  return 'B';
+              }
+          }
+          class A extends B{             
+              method1(): string {
+                  return 'value1';
+              }
+              method2(x: number): number {
+                  return 13;
+              }
+          }
+          const expectedNewMethod1Value = 'new value';
+          const expectedNewMethod2Value = 43;
+          const expectedMethodBValue = 'new B value';
+          const expectedMethod2Argument = 111;
+
+          const stub = stubConstructor(A);
+          
+          expect(stub.method1()).to.be.undefined;
+          expect(stub.method2(expectedMethod2Argument)).to.be.undefined;
+          expect(stub.methodB()).to.be.undefined;
+
+          stub.method1.returns(expectedNewMethod1Value);
+          stub.method2.returns(expectedNewMethod2Value);
+          stub.methodB.returns(expectedMethodBValue);
+          expect(stub.method2).to.have.been.calledWith(expectedMethod2Argument);
+
+          expect(stub.method1()).to.equal(expectedNewMethod1Value);
+          expect(stub.method2(222)).to.equal(expectedNewMethod2Value);
+          expect(stub.methodB()).to.equal(expectedMethodBValue);
+          expect(stub.method2).to.have.been.calledWith(222);
+      });
     });
 });

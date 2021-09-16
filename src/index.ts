@@ -15,7 +15,7 @@ export type ObjectMethodsMap<T> = {
 
 export function stubObject<T extends object>(object: T, methods?: ObjectMethodsKeys<T> | ObjectMethodsMap<T>): StubbedInstance<T> {
     const stubObject = Object.assign(<sinon.SinonStubbedInstance<T>> {}, object);
-    const objectMethods = Object.getOwnPropertyNames(Object.getPrototypeOf(object));
+    const objectMethods = getObjectMethods(object)
     const excludedMethods: string[] = [
         '__defineGetter__', '__defineSetter__', 'hasOwnProperty',
         '__lookupGetter__', '__lookupSetter__', 'propertyIsEnumerable',
@@ -73,6 +73,20 @@ export function stubInterface<T extends object>(methods: ObjectMethodsMap<T> = {
             return target[name];
         }
     })
+}
+
+function getObjectMethods(object: object): Array<string> {
+    const methods: Array<string> = [];
+    while ((object = Reflect.getPrototypeOf(object))) {
+        const keys = Reflect.ownKeys(object);
+        keys.forEach((key) => {
+            if (typeof key === 'string') {
+              methods.push(key);
+            }
+        });
+    }
+        
+    return methods;
 }
 
 sinon['stubObject'] = stubObject;
