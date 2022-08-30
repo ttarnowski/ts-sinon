@@ -2,7 +2,6 @@ import * as chai from "chai";
 import * as sinonChai from "sinon-chai";
 
 import { stubObject, stubInterface, stubConstructor } from "./index";
-import * as s from "./index"
 
 chai.use(sinonChai);
 const expect = chai.expect;
