@@ -12,9 +12,9 @@ Sinon extension providing functions to:
 
 ## Installation
 
-`npm install --save-dev ts-sinon`
+`npm install --save-dev sinon @types/sinon ts-sinon`
 or
-`yarn add --dev ts-sinon`
+`yarn add --dev sinon @types/sinon ts-sinon`
 
 ## Object stubs example
 
@@ -205,15 +205,17 @@ const tsStubInterface = tsSinon.stubInterface<T>();
 
 ## Packages
 
-##### Dependencies:
-1. [Microsoft/TypeScript](https://github.com/Microsoft/TypeScript)
-2. [TypeStrong/ts-node](https://github.com/TypeStrong/ts-node)
-3. [sinonjs/sinon](https://github.com/sinonjs/sinon)
+##### Peer Dependencies:
+1. [sinonjs/sinon](https://github.com/sinonjs/sinon)
+2. [@types/sinon](https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/sinon)
+
 
 ##### Dev Dependencies:
-4. [mochajs/mocha](https://github.com/mochajs/mocha)
-5. [chaijs/chai](https://github.com/chaijs/chai)
-6. [domenic/sinon-chai](https://github.com/domenic/sinon-chai)
+1. [Microsoft/TypeScript](https://github.com/Microsoft/TypeScript)
+2. [TypeStrong/ts-node](https://github.com/TypeStrong/ts-node)
+3. [mochajs/mocha](https://github.com/mochajs/mocha)
+4. [chaijs/chai](https://github.com/chaijs/chai)
+5. [domenic/sinon-chai](https://github.com/domenic/sinon-chai)
 
 ## Tests
 
