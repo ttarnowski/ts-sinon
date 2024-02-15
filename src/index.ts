@@ -61,8 +61,8 @@ export function stubConstructor<T extends new (...args: any[]) => any>(
     return stubObject(new constructor(...constructorArgs));
 }
 
-export function stubInterface<T extends object>(methods: ObjectMethodsMap<T> = {}): StubbedInstance<T> {
-    const object = stubObject<T>(<T> {}, methods);
+export function stubInterface<T extends object>(methods: ObjectMethodsMap<T> = {}, properties: Partial<T> = {}): StubbedInstance<T> {
+    const object = stubObject<T>(<T> {...properties}, methods);
         
     return new Proxy(object, {
         get: (target, name) => {

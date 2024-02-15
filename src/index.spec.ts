@@ -1,8 +1,7 @@
 import * as chai from "chai";
 import * as sinonChai from "sinon-chai";
 
-import { stubObject, stubInterface, stubConstructor } from "./index";
-import * as s from "./index"
+import { stubConstructor, stubInterface, stubObject } from "./index";
 
 chai.use(sinonChai);
 const expect = chai.expect;
@@ -245,6 +244,45 @@ describe('ts-sinon', () => {
                 expect(e).to.equal(interfaceITestStub);
             }
         });
+
+        describe('stub class while avoiding calling constructor', () => {
+            class A {
+              test() {
+                return 123;
+              }
+              constructor() {
+                throw new Error('too many side effects for tests');
+              }
+              public readonly readOnly: number = 3;
+              public prop = 5;
+              public propertyFunction = (x: number) => 7;
+              get getter() {
+                return 9;
+              }
+              set setter(val: number) {
+                throw new Error('error');
+              }
+              run() {
+                return 'run';
+              }
+            }
+        
+            it('returns stub object create from class without calling constructor', () => {
+              const stubWithoutCallingCtor = stubInterface<A>({}, { getter: 10, readOnly: 5 });
+              expect(stubWithoutCallingCtor.test()).to.be.undefined;
+              expect(stubWithoutCallingCtor.run()).to.be.undefined;
+              expect(stubWithoutCallingCtor.run).to.have.been.called;
+              expect(stubWithoutCallingCtor.test).to.have.been.called;
+              stubWithoutCallingCtor.prop = 20;
+              expect(stubWithoutCallingCtor.prop).to.equal(20);
+              stubWithoutCallingCtor.propertyFunction.returns(8);
+              expect(stubWithoutCallingCtor.readOnly).to.equal(5);
+              expect(stubWithoutCallingCtor.propertyFunction(11)).to.equal(8);
+              expect(stubWithoutCallingCtor.propertyFunction).to.have.been.calledWith(11);
+              expect(stubWithoutCallingCtor.getter).to.equal(10);
+              stubWithoutCallingCtor.setter = 10;
+            });
+          });
     });         
     
     describe('stubConstructor', () => {
